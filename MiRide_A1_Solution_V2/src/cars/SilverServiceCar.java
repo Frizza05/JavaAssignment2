@@ -49,7 +49,6 @@ public class SilverServiceCar extends Car {
 			details = details + String.format("%-25s %s\n", "Item " + (i+1),refreshments[i]);
 		}
 		
-		System.out.println(details);
 		return details;
 		
 	}
@@ -70,6 +69,11 @@ public class SilverServiceCar extends Car {
 	@Override
 	public double getBookingFee() {
 		return bookingFee;
+	}
+	
+	@Override
+	public boolean checkSilverServiceCar() {
+		return true;
 	}
 	
 }

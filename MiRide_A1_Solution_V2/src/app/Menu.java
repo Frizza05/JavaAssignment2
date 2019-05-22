@@ -60,7 +60,7 @@ public class Menu
 					searchAvailable();
 					break;
 				case "SD":
-					application.seedData();
+					seedData();
 					break;
 				case "EX":
 					choice = "EX";
@@ -363,6 +363,12 @@ public class Menu
 		String sortOrder = console.nextLine().toUpperCase();
 		
 		System.out.println(application.displayAllBookings(type, sortOrder));
+	}
+	
+	private void seedData() {
+		if (!application.seedData()) {
+			System.out.println("Error - Cars Already Exist");
+		}
 	}
 	
 }
