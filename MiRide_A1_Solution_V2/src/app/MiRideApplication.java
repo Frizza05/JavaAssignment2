@@ -1,6 +1,7 @@
 package app;
 
 import cars.Car;
+import cars.SilverServiceCar;
 import utilities.DateTime;
 import utilities.MiRidesUtilities;
 
@@ -15,6 +16,7 @@ public class MiRideApplication
 	private Car[] cars = new Car[15];
 	private int itemCount = 0;
 	private String[] availableCars;
+	private Car[] sortedCars = new Car[15];
 
 	public MiRideApplication()
 	{
@@ -36,6 +38,22 @@ public class MiRideApplication
 		return "Error: Already exists in the system.";
 	}
 
+	public String createSilverCar(String id, String make, String model, String driverName, int numPassengers, 
+			double standardFee, String[] refreshments) 
+	{
+		String validId = isValidId(id);
+		if(isValidId(id).contains("Error:"))
+		{
+			return validId;
+		}
+		if(!checkIfCarExists(id)) {
+			cars[itemCount] = new SilverServiceCar(id, make, model, driverName, numPassengers, standardFee, refreshments);
+			itemCount++;
+			return "New Car added successfully for registion number: " + cars[itemCount-1].getRegistrationNumber();
+		}
+		return "Error: Already exists in the system.";
+	}
+	
 	public String[] book(DateTime dateRequired)
 	{
 		int numberOfAvailableCars = 0;
@@ -187,6 +205,7 @@ public class MiRideApplication
 				if(cars[i].getRegistrationNumber().equals(regNo))
 				{
 					return cars[i].getDetails();
+					
 				}
 			}
 		}
@@ -245,11 +264,14 @@ public class MiRideApplication
 		DateTime inTwoDays = new DateTime(2);
 		rover.book("Rodney", "Cocker", inTwoDays, 3);
 		rover.completeBooking("Rodney", "Cocker", inTwoDays,75);
+		
+		System.out.println(toyota.toString());
+		
 		return true;
 	}
 
-	public String displayAllBookings()
-	{
+	public String displayAllBookings(String type, String sortOrder)
+	{		
 		if(itemCount == 0)
 		{
 			return "No cars have been added to the system.";
@@ -257,10 +279,38 @@ public class MiRideApplication
 		StringBuilder sb = new StringBuilder();
 		sb.append("Summary of all cars: ");
 		sb.append("\n");
+		
+		int count = cars.length;
+		int index = 0;
+		
+		if (type.equals("SD")) {
+			for (int i = 0; i < count; i++) {
+				if (cars[i] != null) {
+					if (!cars[i].checkSilverServiceCar()) {
+						sortedCars[index] = cars[i];
+						index++;
+					}
+				}
+			}
+			
+			selectionSort(sortOrder);
+			
+		}
+		
+		if (type.equals("SS")) {
+			for (int i = 0; i < count; i++) {
+				if (cars[i] != null) {
+					if (!cars[i].checkSilverServiceCar()) {
+						sortedCars[index] = cars[i];
+						index++;
+					}
+				}
+			}
+		}
 
 		for (int i = 0; i < itemCount; i++)
 		{
-			sb.append(cars[i].getDetails());
+			sb.append(sortedCars[i].getDetails());
 		}
 		return sb.toString();
 	}
@@ -319,5 +369,74 @@ public class MiRideApplication
 			}
 		}
 		return car;
+	}
+	
+	public String searchAvailable(String type, DateTime required) {
+		StringBuilder available = new StringBuilder();
+		int count = cars.length;
+		Car[] availableCars = new Car[15];
+		int index = 0;
+		
+		if (type.equals("SS")) {
+			for (int i = 0; i < count; i++) {
+				if (cars[i] != null) {
+					if (!cars[i].isCarBookedOnDate(required) && cars[i].checkSilverServiceCar()) {
+						availableCars[index] = cars[i];
+						index++;
+					}
+				}
+			}
+		}
+		if (type.equals("SD")) {
+			for (int i = 0; i < count; i++) {
+				if (cars[i] != null) {
+					if (!cars[i].isCarBookedOnDate(required) && !cars[i].checkSilverServiceCar()) {
+						availableCars[index] = cars[i];
+						index++;
+					}
+				}
+			}
+		}
+		
+		for (int i = 0; i < availableCars.length; i++) {
+			if (availableCars[i] != null) {
+				available.append(String.format("%-15s", availableCars[i].getDetails()));
+			}
+		}
+		
+		return available.toString();
+	}
+	
+	public void selectionSort(String sort) {
+		for (int i = 0; i < this.sortedCars.length; i++) {
+	        Car min = this.sortedCars[i];
+	        int minId = i;
+	        if (sort.equals("A")) {
+	        	for (int j = i+1; j < this.sortedCars.length; j++) {
+		        	if (sortedCars[j] != null) {
+		        		 if (this.sortedCars[j].getRegistrationNumber().compareTo(min.getRegistrationNumber()) < 0) {
+		 	                min = this.sortedCars[j];
+		 	                minId = j;
+		        		 }
+		            }
+		        }
+	        }
+	        
+	        if (sort.equals("D")) {
+	        	for (int j = i+1; j < this.sortedCars.length; j++) {
+		        	if (sortedCars[j] != null) {
+		        		 if (this.sortedCars[j].getRegistrationNumber().compareTo(min.getRegistrationNumber()) > 0) {
+		 	                min = this.sortedCars[j];
+		 	                minId = j;
+		        		 }
+		            }
+		        }
+	        }
+	        
+	        // swapping
+	        Car temp = this.sortedCars[i];
+	        this.sortedCars[i] = min;
+	        this.sortedCars[minId] = temp;
+	    }
 	}
 }

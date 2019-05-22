@@ -50,11 +50,14 @@ public class Menu
 					completeBooking();
 					break;
 				case "DA":
-					System.out.println(application.displayAllBookings());
+					displayAllCars();
 					break;
 				case "SS":
 					System.out.print("Enter Registration Number: ");
 					System.out.println(application.displaySpecificCar(console.nextLine()));
+					break;
+				case "SA":
+					searchAvailable();
 					break;
 				case "SD":
 					application.seedData();
@@ -78,6 +81,8 @@ public class Menu
 	private void createCar()
 	{
 		String id = "", make, model, driverName;
+		String serviceType;
+		double standardFee;
 		int numPassengers = 0;
 
 		System.out.print("Enter registration number: ");
@@ -96,13 +101,37 @@ public class Menu
 
 			System.out.print("Enter number of passengers: ");
 			numPassengers = promptForPassengerNumbers();
-
+			
 			boolean result = application.checkIfCarExists(id);
-
+			
+			System.out.print("Enter Service Type (SD/SS) ");
+			serviceType = console.nextLine().toUpperCase();
+			
 			if (!result)
 			{
-				String carRegistrationNumber = application.createCar(id, make, model, driverName, numPassengers);
-				System.out.println(carRegistrationNumber);
+				boolean option = false;
+				while (!option) {
+					if (serviceType.equals("SD")) {
+						String carRegistrationNumber = application.createCar(id, make, model, driverName, numPassengers);
+						System.out.println(carRegistrationNumber);
+						option = true;
+					}
+					if (serviceType.equals("SS")) {
+						System.out.print("Enter Standard Fee:");
+						standardFee = console.nextDouble();
+						console.nextLine();
+						System.out.print("Enter List of Refreshments:");
+						String stringRefreshments = console.nextLine();
+						String[] refreshments = stringRefreshments.split(",");
+						
+						
+						String carRegistrationNumber = application.createSilverCar(id, make, model, driverName, numPassengers, standardFee, refreshments);
+						System.out.println(carRegistrationNumber);
+						option = true;
+					}
+						
+				}
+				
 			} else
 			{
 				System.out.println("Error - Already exists in the system");
@@ -148,8 +177,8 @@ public class Menu
 			String lastName = console.nextLine();
 			System.out.println("Please enter the number of passengers:");
 			int numPassengers = Integer.parseInt(console.nextLine());
+			
 			String result = application.book(firstName, lastName, dateRequired, numPassengers, regNo);
-
 			System.out.println(result);
 		} else
 		{
@@ -280,6 +309,32 @@ public class Menu
 			return regNo;
 		}
 	}
+	
+	public void searchAvailable() {
+		boolean valid = false;
+		while (!valid) {
+			System.out.print("Enter Type (SD/SS):");
+			String type = console.nextLine().toUpperCase();
+			
+			if (type.equals("SD") || type.equals("SS")) {
+				System.out.print("Date:");
+				String dateEntered = console.nextLine();
+				int day = Integer.parseInt(dateEntered.substring(0, 2));
+				int month = Integer.parseInt(dateEntered.substring(3, 5));
+				int year = Integer.parseInt(dateEntered.substring(6));
+				DateTime dateRequired = new DateTime(day, month, year);
+				
+				valid = true;
+				
+				System.out.println(application.searchAvailable(type, dateRequired));
+				
+			}
+			else {
+				System.out.println("Error - Please Enter SD or SS");
+			}
+		}
+		
+	}
 
 	/*
 	 * Prints the menu.
@@ -299,4 +354,15 @@ public class Menu
 		System.out.println("\nEnter your selection: ");
 		System.out.println("(Hit enter to cancel any operation)");
 	}
+	
+	private void displayAllCars() {
+		System.out.print("Enter Type (SD/SS):");
+		String type = console.nextLine().toUpperCase();
+		
+		System.out.print("Enter Sort Order (A/D):");
+		String sortOrder = console.nextLine().toUpperCase();
+		
+		System.out.println(application.displayAllBookings(type, sortOrder));
+	}
+	
 }

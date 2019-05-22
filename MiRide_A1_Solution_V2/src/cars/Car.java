@@ -187,6 +187,35 @@ public class Car
 		{
 			sb.append(String.format("%-15s %s\n", "Available:", "NO"));
 		}
+		
+		sb.append(String.format("%-15s\n", ""));
+		
+		
+		if (hasBookings(currentBookings)) {
+			sb.append(String.format("%-15s\n", "CURRENT BOOKINGS"));
+			for (int i = 0; i < currentBookings.length; i++)
+			{
+				if (currentBookings[i] != null)
+				{
+					sb.append(String.format("%-15s", currentBookings[i].getDetails()));
+					
+				}
+			}
+		}
+		
+		if (hasBookings(pastBookings)) {
+			sb.append(String.format("%-15s\n", "PAST BOOKINGS"));
+			for (int i = 0; i < pastBookings.length; i++)
+			{
+				if (pastBookings[i] != null)
+				{
+					sb.append(String.format("%-15s", pastBookings[i].getDetails()));
+					
+				}
+			}
+		}
+		
+		
 
 		return sb.toString();
 	}
@@ -211,7 +240,35 @@ public class Car
 		{
 			sb.append(":" + "NO");
 		}
-
+		
+		sb.append(":" + getBookingFee());
+		
+		if (hasBookings(currentBookings)) {
+			sb.append(String.format("|"));
+			for (int i = 0; i < currentBookings.length; i++)
+			{
+				if (currentBookings[i] != null)
+				{
+					sb.append(currentBookings[i].toString());
+					sb.append("|");
+					
+				}
+			}
+		}
+		
+		if (hasBookings(pastBookings)) {
+			sb.append(String.format("|"));
+			for (int i = 0; i < pastBookings.length; i++)
+			{
+				if (pastBookings[i] != null)
+				{
+					sb.append(pastBookings[i].toString());
+					sb.append("|");
+					
+				}
+			}
+		}
+		
 		return sb.toString();
 	}
 
@@ -229,6 +286,10 @@ public class Car
 	public double getTripFee()
 	{
 		return tripFee;
+	}
+	
+	public double getBookingFee() {
+		return STANDARD_BOOKING_FEE;
 	}
 
 	/*
@@ -437,4 +498,9 @@ public class Car
 			this.passengerCapacity = -1;
 		}
 	}
+	
+	public boolean checkSilverServiceCar() {
+		return false;
+	}
+	
 }

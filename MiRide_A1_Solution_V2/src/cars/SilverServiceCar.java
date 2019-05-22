@@ -8,7 +8,8 @@ public class SilverServiceCar extends Car {
 	private boolean available;
 	
 
-	public SilverServiceCar(String regNo, String make, String model, String driverName, int passengerCapacity, double bookingFee, String[] refreshments) {
+	public SilverServiceCar(String regNo, String make, String model, String driverName, int passengerCapacity, 
+			double bookingFee, String[] refreshments) {
 		super(regNo,make,model,driverName,passengerCapacity);
 		this.bookingFee = bookingFee;
 		this.refreshments = refreshments;
@@ -64,6 +65,11 @@ public class SilverServiceCar extends Car {
 		
 		
 		return toString;
+	}
+	
+	@Override
+	public double getBookingFee() {
+		return bookingFee;
 	}
 	
 }
