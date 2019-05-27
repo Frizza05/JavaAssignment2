@@ -1,5 +1,6 @@
 package cars;
 
+import exceptions.InvalidBooking;
 import utilities.DateTime;
 
 public class SilverServiceCar extends Car {
@@ -24,7 +25,7 @@ public class SilverServiceCar extends Car {
 	}
 	
 	@Override
-	public boolean book(String firstName, String lastName, DateTime required, int numPassengers) {
+	public boolean book(String firstName, String lastName, DateTime required, int numPassengers) throws InvalidBooking {
 		boolean booked = false;
 		DateTime currentDate = new DateTime();
 		

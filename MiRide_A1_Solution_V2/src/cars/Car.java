@@ -2,6 +2,7 @@ package cars;
 
 import java.util.ArrayList;
 
+import exceptions.InvalidBooking;
 import utilities.DateTime;
 import utilities.DateUtilities;
 import utilities.MiRidesUtilities;
@@ -66,7 +67,7 @@ public class Car
 	 * Booking six cars
 	 */
 
-	public boolean book(String firstName, String lastName, DateTime required, int numPassengers)
+	public boolean book(String firstName, String lastName, DateTime required, int numPassengers) throws InvalidBooking
 	{
 		boolean booked = false;
 		// Does car have five bookings
@@ -76,7 +77,7 @@ public class Car
 		boolean dateValid = dateIsValid(required);
 		// Number of passengers does not exceed the passenger capacity and is not zero.
 		boolean validPassengerNumber = numberOfPassengersIsValid(numPassengers);
-
+		
 		// Booking is permissible
 		if (available && dateAvailable && dateValid && validPassengerNumber)
 		{
@@ -85,6 +86,10 @@ public class Car
 			currentBookings[bookingSpotAvailable] = booking;
 			bookingSpotAvailable++;
 			booked = true;
+		}
+		
+		if (!available || !dateAvailable || !dateValid) {
+			throw new InvalidBooking("Invalid Date Exception");
 		}
 		return booked;
 	}

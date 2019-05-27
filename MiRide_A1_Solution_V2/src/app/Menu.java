@@ -3,6 +3,7 @@ package app;
 import java.util.Scanner;
 import utilities.DateTime;
 import utilities.DateUtilities;
+import exceptions.InvalidBooking;
 
 /*
  * Class:		Menu
@@ -60,7 +61,13 @@ public class Menu
 					searchAvailable();
 					break;
 				case "SD":
-					seedData();
+					try
+					{
+						seedData();
+					} catch (InvalidBooking e)
+					{
+						System.out.println("Error - Invalid Booking Date");
+					}
 					break;
 				case "EX":
 					choice = "EX";
@@ -177,9 +184,13 @@ public class Menu
 			String lastName = console.nextLine();
 			System.out.println("Please enter the number of passengers:");
 			int numPassengers = Integer.parseInt(console.nextLine());
-			
-			String result = application.book(firstName, lastName, dateRequired, numPassengers, regNo);
-			System.out.println(result);
+			try {
+				String result = application.book(firstName, lastName, dateRequired, numPassengers, regNo);
+				System.out.println(result);
+			}
+			catch (InvalidBooking e){
+				System.out.println("Error - Invalid Booking Date");
+			}
 		} else
 		{
 			System.out.println("There are no available cars on this date.");
@@ -365,7 +376,7 @@ public class Menu
 		System.out.println(application.displayAllBookings(type, sortOrder));
 	}
 	
-	private void seedData() {
+	private void seedData() throws InvalidBooking {
 		if (!application.seedData()) {
 			System.out.println("Error - Cars Already Exist");
 		}
