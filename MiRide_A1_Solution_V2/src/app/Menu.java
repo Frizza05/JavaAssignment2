@@ -4,6 +4,7 @@ import java.util.Scanner;
 import utilities.DateTime;
 import utilities.DateUtilities;
 import exceptions.InvalidBooking;
+import java.io.PrintWriter;
 
 /*
  * Class:		Menu
@@ -22,7 +23,9 @@ public class Menu
 	 * Runs the menu in a loop until the user decides to exit the system.
 	 */
 	public void run()
-	{
+	{		
+		application.readFile();
+		
 		final int MENU_ITEM_LENGTH = 2;
 		String input;
 		String choice = "";
@@ -70,8 +73,7 @@ public class Menu
 					}
 					break;
 				case "EX":
-					choice = "EX";
-					System.out.println("Exiting Program ... Goodbye!");
+					exit();
 					break;
 				default:
 					System.out.println("Error, invalid option selected!");
@@ -380,6 +382,11 @@ public class Menu
 		if (!application.seedData()) {
 			System.out.println("Error - Cars Already Exist");
 		}
+	}
+	
+	private void exit() {
+		application.writeFile();
+		System.out.println("Exiting Program ... Goodbye!");
 	}
 	
 }

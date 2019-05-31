@@ -3,8 +3,16 @@ package app;
 import cars.Car;
 import cars.SilverServiceCar;
 import exceptions.InvalidBooking;
+import exceptions.InvalidRefreshments;
 import utilities.DateTime;
 import utilities.MiRidesUtilities;
+import java.io.PrintWriter;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 
 /*
  * Class:			MiRideApplication
@@ -48,9 +56,14 @@ public class MiRideApplication
 			return validId;
 		}
 		if(!checkIfCarExists(id)) {
-			cars[itemCount] = new SilverServiceCar(id, make, model, driverName, numPassengers, standardFee, refreshments);
-			itemCount++;
-			return "New Car added successfully for registion number: " + cars[itemCount-1].getRegistrationNumber();
+			try {
+				cars[itemCount] = new SilverServiceCar(id, make, model, driverName, numPassengers, standardFee, refreshments);
+				itemCount++;
+				return "New Car added successfully for registion number: " + cars[itemCount-1].getRegistrationNumber();
+			}
+			catch (InvalidRefreshments e) {
+				return "Error: Invalid Refreshments List";
+			}
 		}
 		return "Error: Already exists in the system.";
 	}
@@ -267,10 +280,9 @@ public class MiRideApplication
 				cars[itemCount] = rover;
 				itemCount++;
 				rover.book("Rodney", "Cocker", new DateTime(1), 3);
-				//rover.completeBooking("Rodney", "Cocker", 75);
 				DateTime inTwoDays = new DateTime(2);
 				rover.book("Rodney", "Cocker", inTwoDays, 3);
-				rover.completeBooking("Rodney", "Cocker", inTwoDays,75);
+				//rover.completeBooking("Rodney", "Cocker", inTwoDays,75);
 				
 				// 2 silver service cars not booked
 				String[] mazdaRefreshments = {"Cola", "Lemonade", "Water"};
@@ -314,6 +326,9 @@ public class MiRideApplication
 		}
 		catch (InvalidBooking e){
 			System.out.println("Error - Invalid Booking Dates");
+		}
+		catch (InvalidRefreshments e) {
+			System.out.println("Error - Invalid Refreshments List");
 		}
 		return valid;
 		
@@ -493,5 +508,174 @@ public class MiRideApplication
 	        this.sortedCars[i] = min;
 	        this.sortedCars[minId] = temp;
 	    }
+	}
+	
+	public void readFile() {
+		File file = new File("cars.txt");
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(file));
+			
+			String readCar;
+			try {
+				while ((readCar = br.readLine()) != null) {
+					executeRead(readCar);
+				}
+				
+			}
+			catch (IOException e) {
+				
+			}
+			catch (InvalidRefreshments e) {
+				System.out.println("Error - Invalid Refreshments List");
+			}
+			
+		}
+		catch (FileNotFoundException e) {
+			File backupFile = new File("carsBackup.txt");
+			
+			try {
+				BufferedReader br = new BufferedReader(new FileReader(backupFile));
+				String readCar;
+				try {
+					while ((readCar = br.readLine()) != null) {
+						executeRead(readCar);
+					}
+					System.out.println("Error - Booking Data File Not Found! Loading Data From Backup File.");
+					
+				}
+				catch (IOException x) {
+					
+				}
+				catch (InvalidRefreshments x) {
+					System.out.println("Error - Invalid Refreshments List");
+				}
+			}
+			catch(FileNotFoundException x) {
+				System.out.println("No Booking Data Found");
+			}
+		}
+		
+		
+		
+	}
+	
+	public void writeFile() {
+		String filename = "cars.txt";
+		PrintWriter outputStream = null;
+		
+		try {
+			outputStream = new PrintWriter(new FileOutputStream(filename));
+			
+			
+			for (int i = 0; i < cars.length; i++) {
+				if (cars[i] != null) {
+					outputStream.write(cars[i].toString() + "\n");
+				}
+			}
+			
+			outputStream.flush();
+			outputStream.close();
+		}
+		catch (FileNotFoundException e) {
+			System.out.println("Error: File Not Found Exception");
+		}
+		
+		filename = "carsBackup.txt";
+		try {
+			outputStream = new PrintWriter(new FileOutputStream(filename));
+			
+			
+			for (int i = 0; i < cars.length; i++) {
+				if (cars[i] != null) {
+					outputStream.write(cars[i].toString() + "\n");
+				}
+			}
+			
+			outputStream.flush();
+			outputStream.close();
+		}
+		catch (FileNotFoundException e) {
+			System.out.println("Error: File Not Found Exception");
+		}
+		
+	}
+	
+	public void executeRead(String readCar) throws InvalidRefreshments{
+		String[] bookingSplit = readCar.split("\\|");
+		String[] splitCar = bookingSplit[0].split(":");
+		int bookingLength = bookingSplit.length;
+		
+		String regNo = splitCar[0];
+		String make = splitCar[1];
+		String model = splitCar[2];
+		String driverName = splitCar[3];
+		int passengerCapacity = Integer.parseInt(splitCar[4]);
+		
+		String[] bookingFeeSplit = splitCar[6].split("\\|");
+		float bookingFee = Float.parseFloat((bookingFeeSplit[0]));
+		
+		if (bookingFee > 1.5) {
+			int refreshmentsLength = splitCar.length - 7;
+			String[] refreshments = new String[refreshmentsLength];
+			
+			for (int i = 7, x = 0; i<splitCar.length;i++,x++) {
+				String [] refreshmentsSplit = splitCar[i].split("\\s+");
+				StringBuilder refreshment = new StringBuilder();
+				
+				for (int y = 2; y<refreshmentsSplit.length;y++) {
+					refreshment.append(refreshmentsSplit[y] + " ");
+				}
+				
+				refreshments[x] = refreshment.toString().trim();
+			}
+			
+			SilverServiceCar createCar = new SilverServiceCar(regNo, make, model, driverName, passengerCapacity, bookingFee, refreshments);
+			cars[itemCount] = createCar;
+			itemCount++;
+			
+			
+			// createSilverCar(regNo, make, model, driverName, passengerCapacity, bookingFee, );
+		}
+		else {
+			
+			Car createCar = new Car(regNo, make, model, driverName, passengerCapacity);
+			cars[itemCount] = createCar;
+			itemCount++;
+		}
+		
+		if (bookingLength > 1) {
+			for (int count = 1; count < bookingLength;count++) {
+				String[] tempBooking = bookingSplit[count].split(":");
+				String date = tempBooking[2];
+				int day = Integer.parseInt(date.substring(0,2));
+				int month = Integer.parseInt(date.substring(2,4));
+				int year = Integer.parseInt(date.substring(4,8));
+				DateTime bookingDate = new DateTime(day,month,year);
+				
+				int passengerCount = Integer.parseInt(tempBooking[4]);
+				float distanceTravelled = Float.parseFloat(tempBooking[5]);
+				
+				String[] nameSplit = tempBooking[3].split("\\s+");
+				String firstName = nameSplit[0];
+				String lastName = nameSplit[1];
+				
+				try {
+					if (distanceTravelled > 0.0) {
+						cars[itemCount-1].book(firstName, lastName, bookingDate, passengerCount);
+						cars[itemCount-1].completeBooking(firstName, lastName, bookingDate, distanceTravelled);
+					
+					}
+					else {
+						cars[itemCount-1].book(firstName, lastName, bookingDate, passengerCount);
+					}
+				}
+				catch(InvalidBooking e) {
+					
+				}
+				
+				
+			}
+		}
+		
 	}
 }

@@ -1,6 +1,7 @@
 package cars;
 
 import exceptions.InvalidBooking;
+import exceptions.InvalidRefreshments;
 import utilities.DateTime;
 
 public class SilverServiceCar extends Car {
@@ -10,7 +11,7 @@ public class SilverServiceCar extends Car {
 	
 
 	public SilverServiceCar(String regNo, String make, String model, String driverName, int passengerCapacity, 
-			double bookingFee, String[] refreshments) {
+			double bookingFee, String[] refreshments) throws InvalidRefreshments {
 		super(regNo,make,model,driverName,passengerCapacity);
 		this.bookingFee = bookingFee;
 		this.refreshments = refreshments;
@@ -21,6 +22,10 @@ public class SilverServiceCar extends Car {
 			bookingFee = 3.00;
 		}
 		
+		//Throw InvalidRefreshments exception found 
+		if (checkRepeating(refreshments)) {
+			throw new InvalidRefreshments("Invalid Refreshments Exception");
+		}
 		
 	}
 	
@@ -63,6 +68,7 @@ public class SilverServiceCar extends Car {
 			toString = toString + String.format(":" + "Item " + (i+1) + " " + refreshments[i]);
 		}
 		
+		toString = toString + String.format(super.addBookings());
 		
 		return toString;
 	}
@@ -77,4 +83,15 @@ public class SilverServiceCar extends Car {
 		return true;
 	}
 	
+	public boolean checkRepeating(String[] refreshments) {
+		for (int i = 0; i < refreshments.length; i++) {
+			for (int j = i + 1; j < refreshments.length; j++) {
+				if (refreshments[i] != null && refreshments[i].equals(refreshments[j])) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
 }

@@ -248,30 +248,8 @@ public class Car
 		
 		sb.append(":" + getBookingFee());
 		
-		if (hasBookings(currentBookings)) {
-			sb.append(String.format("|"));
-			for (int i = 0; i < currentBookings.length; i++)
-			{
-				if (currentBookings[i] != null)
-				{
-					sb.append(currentBookings[i].toString());
-					sb.append("|");
-					
-				}
-			}
-		}
-		
-		if (hasBookings(pastBookings)) {
-			sb.append(String.format("|"));
-			for (int i = 0; i < pastBookings.length; i++)
-			{
-				if (pastBookings[i] != null)
-				{
-					sb.append(pastBookings[i].toString());
-					sb.append("|");
-					
-				}
-			}
+		if (!checkSilverServiceCar()) {
+			sb.append(addBookings());
 		}
 		
 		return sb.toString();
@@ -506,6 +484,36 @@ public class Car
 	
 	public boolean checkSilverServiceCar() {
 		return false;
+	}
+	
+	public String addBookings() {
+		StringBuilder toString = new StringBuilder();
+		if (hasBookings(currentBookings)) {
+			toString.append(String.format("|"));
+			for (int i = 0; i < currentBookings.length; i++)
+			{
+				if (currentBookings[i] != null)
+				{
+					toString.append(currentBookings[i].toString());
+					toString.append("|");
+					
+				}
+			}
+		}
+		
+		if (hasBookings(pastBookings)) {
+			toString.append(String.format("|"));
+			for (int i = 0; i < pastBookings.length; i++)
+			{
+				if (pastBookings[i] != null)
+				{
+					toString.append(pastBookings[i].toString());
+					toString.append("|");
+					
+				}
+			}
+		}
+		return toString.toString();
 	}
 	
 }
